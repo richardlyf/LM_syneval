@@ -3,6 +3,27 @@ This repository contains data and evaluation code for the following paper:
 
 R. Marvin and T. Linzen. 2018. Targeted Syntactic Evaluation of Language Models. Proceedings of EMNLP. 
 
+## UPDATED HOW TO USE THIS CODE -- Richard
+
+First update `workdir` in `hyperparameters.txt` to be the current directory
+
+## Training the lanugage model
+To train a basic LSTM language model:
+```
+mkdir models
+python word-language-model/main.py --lm_data data/wikitext-2/ --save models/lstm_lm.pt --save_lm_data models/lstm_lm.bin
+```
+
+To test the model:
+```
+cd src
+python LM_eval.py --model ../models/lstm_lm.pt --lm_data ../models/lstm_lm.bin --model_type RNN
+python analyze_results.py --results_file RNN_results.pickle --model_type RNN --mode $MODE
+```
+$MODE is an optional argument that can be 'full' or 'condensed' or 'overall' (default is 'overall').
+The computed result is stored in `results` at root level.
+
+
 ## HOW TO USE THIS CODE
 
 ### Language model training data
