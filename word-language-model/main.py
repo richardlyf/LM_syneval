@@ -165,7 +165,7 @@ if not args.test:
         if (not args.single) and (torch.cuda.device_count() > 1):
             # Scatters minibatches (in dim=1) across available GPUs
             model = nn.DataParallel(model,dim=1)
-        model.cuda()
+        model = model.cuda()
 
 criterion = nn.CrossEntropyLoss()
 
@@ -281,12 +281,12 @@ def repackage_hidden(h):
 def test_get_batch(source, evaluation=False):
     if isinstance(source, tuple):
         seq_len = len(source[0]) - 1
-        data = Variable(source[0][:seq_len], volatile=evaluation)
-        target = Variable(source[1][:seq_len], volatile=evaluation)
+        data = Variable(source[0][:seq_len])
+        target = Variable(source[1][:seq_len])
         
     else:
         seq_len = len(source) - 1
-        data = Variable(source[:seq_len], volatile=evaluation)
+        data = Variable(source[:seq_len])
         target = Variable(source[1:1+seq_len].view(-1))
     # This is where data should be CUDA-fied to lessen OOM errors
     if args.cuda:
@@ -297,11 +297,11 @@ def test_get_batch(source, evaluation=False):
 def get_batch(source, i, evaluation=False):
     if isinstance(source, tuple):
         seq_len = min(args.bptt, len(source[0]) - 1 - i)
-        data = Variable(source[0][i:i+seq_len], volatile=evaluation)
+        data = Variable(source[0][i:i+seq_len])
         target = Variable(source[1][i:i+seq_len].view(-1))
     else:
         seq_len = min(args.bptt, len(source) - 1 - i)
-        data = Variable(source[i:i+seq_len], volatile=evaluation)
+        data = Variable(source[i:i+seq_len])
         target = Variable(source[i+1:i+1+seq_len].view(-1))
     #This is where data should be CUDA-fied to lessen OOM errors
     if args.cuda:
@@ -383,7 +383,7 @@ def evaluate(lm_data_source, ccg_data_source):
         hidden = repackage_hidden(hidden)
     if len(ccg_data_source) == 0:
         return total_loss / len(lm_data_source)
-    return total_loss[0] / (len(lm_data_source)+len(ccg_data_source))
+    return total_loss / (len(lm_data_source)+len(ccg_data_source))
 
 
 def train():
@@ -425,7 +425,7 @@ def train():
         total_loss += loss.item()#data
 
         if batch % args.log_interval == 0 and batch > 0:
-            cur_loss = total_loss[0] / args.log_interval
+            cur_loss = total_loss / args.log_interval
             elapsed = time.time() - start_time
             print('| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f} | ms/batch {:5.2f} | '
                     'loss {:5.2f} | ppl {:8.2f}'.format(
